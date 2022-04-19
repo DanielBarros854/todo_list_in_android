@@ -71,6 +71,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void configActionClickList() {
+        configShortClick();
+        configLongClick();
+    }
+
+    private  void configLongClick() {
+        listaTarefas.setOnItemLongClickListener(
+                new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Tarefa selectTarefa = (Tarefa) adapterView.getItemAtPosition(i);
+                        dao.remove(selectTarefa);
+                        adapter.remove(selectTarefa);
+                        adapter.notifyDataSetChanged();
+                        return true;
+                    }
+                }
+        );
+    }
+
+    private void configShortClick() {
         listaTarefas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

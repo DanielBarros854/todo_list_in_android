@@ -28,4 +28,11 @@ public class TarefaDAO {
             tarefas.set(posicao, tarefa);
         }
     }
+
+    public void remove(Tarefa tarefa) {
+        Tarefa remove = findTarefaByID(tarefa);
+        if (remove != null) {
+            tarefas.remove(remove);
+        }
+    }
 }
