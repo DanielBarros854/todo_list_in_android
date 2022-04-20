@@ -1,13 +1,19 @@
 package com.example.tarefas;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.example.tarefas.model.Tarefa;
@@ -32,6 +38,43 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         configListTarefa();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.list_tarefa_menu,menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        selectMenuContext(item);
+        return super.onContextItemSelected(item);
+    }
+
+    private void selectMenuContext(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.list_tarefa_deletar:
+                removeTarefa(item);
+                break;
+
+            case R.id.list_tarefa_info:
+                showMessage("Nada feito hoje");
+                break;
+        }
+    }
+
+    private void removeTarefa(@NonNull MenuItem item) {
+        AdapterView.AdapterContextMenuInfo menuInfo =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        Tarefa selectTarefa = adapter.getItem(menuInfo.position);
+        dao.remove(selectTarefa);
+        adapter.remove(selectTarefa);
+        adapter.notifyDataSetChanged();
+
+        showMessage("Tarefa deletada");
     }
 
     private  void loadWidgets() {
@@ -76,18 +119,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private  void configLongClick() {
-        listaTarefas.setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        Tarefa selectTarefa = (Tarefa) adapterView.getItemAtPosition(i);
-                        dao.remove(selectTarefa);
-                        adapter.remove(selectTarefa);
-                        adapter.notifyDataSetChanged();
-                        return true;
-                    }
-                }
-        );
+        registerForContextMenu(listaTarefas);
     }
 
     private void configShortClick() {
@@ -103,5 +135,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void showMessage(String msg) {
+        Toast.makeText(
+                MainActivity.this,
+                msg,
+                Toast.LENGTH_SHORT
+        ).show();
     }
 }

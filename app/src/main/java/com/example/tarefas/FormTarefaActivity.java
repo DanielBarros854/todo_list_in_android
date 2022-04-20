@@ -1,9 +1,12 @@
 package com.example.tarefas;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,21 +38,55 @@ public class FormTarefaActivity extends AppCompatActivity {
         btnAdicionar = findViewById(R.id.btn_add_tarefa);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.form_tarefa_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.form_tarefa_menu_salvar:
+                validFields();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void configButtonPersist() {
         btnAdicionar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                populateTarefa();
-
-                if (editTarefa()) {
-                    edit();
-                } else {
-                    save();
-                }
-
-                finish();
+                validFields();
             }
         });
+    }
+
+    private void validFields() {
+        if (fieldsNotEmpty()) {
+            persistTarefa();
+        } else {
+            showMessage("Campo invalido");
+        }
+    }
+
+    private void persistTarefa() {
+        populateTarefa();
+
+        if (editTarefa()) {
+            edit();
+        } else {
+            save();
+        }
+
+        finish();
+    }
+
+    private boolean fieldsNotEmpty() {
+        return !etTitleTarefa.getText().toString().isEmpty()
+                && !etDescriptionTarefa.getText().toString().isEmpty();
     }
 
     private void verifyExtraIntent() {
